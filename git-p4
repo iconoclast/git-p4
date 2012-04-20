@@ -2196,14 +2196,16 @@ class P4Sync(Command):
         if self.fileDump:
             self.gitStream = open("git-p4-dump", "wb")
         else:
+            gitFastImportCmd = "git fast-import"
             if self.debug:
                 tmpfile = "%s/p4import" % tempfile.gettempdir()
                 print "Writing input for 'git fast-import' to %s\n" % tmpfile
                 debugDumpFile = open(tmpfile, "w")
             else:
+                gitFastImportCmd += " --quiet"
                 debugDumpFile = None
 
-            importProcess = subprocess.Popen(["git", "fast-import"],
+            importProcess = subprocess.Popen(shlex.split(gitFastImportCmd),
                                              stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             self.gitStream = LargeFileWriter(importProcess.stdin, debugDumpFile)
 
